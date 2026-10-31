@@ -1,4 +1,4 @@
-/* OBHG Clinical Triage UI (TEST BUILD with Shift Patient Log; log stored on device only, keys prefixed 'shiftlogtest_'). No network calls, no storage of the HPI, no analytics. */
+/* OBHG Clinical Triage UI (with Shift Patient Log; log stored on device only, keys prefixed 'shiftlog_'). No network calls, no storage of the HPI, no analytics. */
 (function () {
   'use strict';
   const C = self.CONTENT, T = self.CODE_TABLES, V = self.CODE_VALIDATION, E = self.TriageEngine;
@@ -37,6 +37,10 @@
   function cardHTML(card, open) {
     return '<div class="cardtext">' + card.html + '</div>';
   }
+  function reviewedHTML(item) {
+    const d = item.lastReviewed || (self.REVIEW && self.REVIEW.DEFAULT);
+    return d ? '<div class="reviewed">Last reviewed: ' + esc(d) + '</div>' : '';
+  }
   function itemHTML(item, companionCard) {
     let h = '<div class="th"><div class="id">' + esc(label(item)) + (item.kind === 'diagram' ? ' · FLOW DIAGRAM' : ' · CARD') +
       (item.superseded ? '<span class="badge warn">SUPERSEDED</span>' : '') +
@@ -46,11 +50,12 @@
       h += '<img class="diag" src="' + esc(item.img) + '" alt="' + esc(item.title) + '" data-zoom="' + esc(item.id) + '">';
       h += verifyBox(item.flags);
       if (item.html) h += '<details class="companion" open><summary>Tree logic (text)</summary><div class="cardtext">' + item.html + '</div></details>';
-      if (companionCard) h += '<details class="companion"' + (companionCard.flags.length ? '' : '') + '><summary>Companion card: ' + esc(label(companionCard)) + ' · ' + esc(companionCard.title) + '</summary>' + verifyBox(companionCard.flags) + cardHTML(companionCard) + '</details>';
+      if (companionCard) h += '<details class="companion"' + (companionCard.flags.length ? '' : '') + '><summary>Companion card: ' + esc(label(companionCard)) + ' · ' + esc(companionCard.title) + '</summary>' + verifyBox(companionCard.flags) + cardHTML(companionCard) + reviewedHTML(companionCard) + '</details>';
     } else {
       h += verifyBox(item.flags) + cardHTML(item);
     }
     h += '<div class="hint">Source: ' + esc(item.source.split('/').slice(-2).join('/')) + '</div>';
+    h += reviewedHTML(item);
     return h;
   }
   function factsHTML(f) {
@@ -179,7 +184,7 @@
   window.addEventListener('pageshow', () => { $('hpi').value = ''; });
 
 
-  // ---------- Shift Patient Log (TEST BUILD) — device-only storage, reuses engine + code tables ----------
+  // ---------- Shift Patient Log — device-only storage, reuses engine + code tables ----------
   const SL = self.ShiftLog, store = SL.Store();
   try { store.autoPurge(); } catch (_) {}
   $('lg-disposition').innerHTML = '<option value="">Select…</option>' + SL.DISPOSITIONS.map(d => '<option>' + esc(d) + '</option>').join('');

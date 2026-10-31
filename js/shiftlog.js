@@ -1,8 +1,8 @@
-/* OBHG Shift Patient Log (TEST BUILD) — pure logic: shift window, validation, storage, purge, PDF.
- * All data stays on the device (localStorage, keys prefixed 'shiftlogtest_'). No network calls. */
+/* OBHG Shift Patient Log — pure logic: shift window, validation, storage, purge, PDF.
+ * All data stays on the device (localStorage, keys prefixed 'shiftlog_'). No network calls. */
 (function (root) {
   'use strict';
-  const PREFIX = 'shiftlogtest_';
+  const PREFIX = 'shiftlog_';
   const K_PROFILE = PREFIX + 'profile', K_LOGS = PREFIX + 'logs';
   const RETAIN_DEFAULT = 30;
   const DISPOSITIONS = ['Discharged home', 'Admitted L&D', 'Admitted antepartum', 'Admitted GYN', 'Admitted postpartum', 'Observation', 'To OR', 'Transferred', 'Other'];
